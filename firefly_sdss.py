@@ -18,8 +18,8 @@ os.environ["STELLARPOPMODELS_DIR"] = os.path.join(os.environ["FF_DIR"], "stellar
 import numpy as np
 from astropy.io import fits
 import astropy.cosmology as co
-import firefly_setup as fs
-import firefly_models as fm
+import src.firefly_setup as fs
+import src.firefly_models as fm
 import time
 
 t0=time.time()

@@ -19,8 +19,8 @@ os.environ["STELLARPOPMODELS_DIR"] = os.path.join(os.environ["FF_DIR"], "stellar
 import numpy as np
 from astropy.io import fits
 import astropy.cosmology as co
-import firefly_setup as fs
-import firefly_models as fm
+import src.firefly_setup as fs
+import src.firefly_models as fm
 import time
 
 t0=time.time()
@@ -41,7 +41,8 @@ error = data[2,:]
 restframe_wavelength = wavelength/(1+redshift)
 
 # RA and DEC
-ra=145.89219 ; dec=0.059372
+ra=145.89219
+dec=0.059372
 
 #velocity dispersion in km/s
 vdisp = 135.89957
@@ -120,8 +121,7 @@ dust_smoothing_length = 200
 max_iterations = 10
 pdf_sampling = 300 
 
-print('')
-print('Starting firefly ...')
+print('\nStarting firefly ...')
 
 age_min = age_limits[0]
 if type(age_limits[1])==str:
