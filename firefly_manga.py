@@ -19,9 +19,9 @@ import multiprocessing
 from multiprocessing import Pool
 import numpy as np
 from astropy.io import fits
-import astropy.cosmology as co
-import src.setup as fs
-import src.models as fm
+from src.config import Config
+from src.setup import Setup
+from src.models import StellarPopulationModel
 
 sys.path.append(os.path.join(os.getcwd(), "python"))
 os.environ["FF_DIR"] = os.getcwd()
@@ -30,14 +30,14 @@ os.environ["STELLARPOPMODELS_DIR"] = os.path.join(
 )
 
 t0 = time.time()
-cosmo = co.Planck15
+
+config = Config().create("config/manga.yaml")
 
 # paths to input files
 logcube_dir = "example_data/manga/"
 maps_dir = "example_data/manga/"
 output_dir = "output/manga/"
 dap_file = "example_data/manga/dapall-v3_1_1-3.1.0.fits"  # For DR15 use dapall-v2_4_3-2.2.1.fits
-suffix = ""
 
 # define plate number, IFU number, bin number
 plate = 8080
@@ -49,122 +49,51 @@ bin_number = 0  #'all' if entire IFU, otherwise bin number
 # mpl-7 = DR15
 mpl = "mpl-11"
 
-# masking emission lines
-# defines size of mask in pixels
-# set to value>0 for masking (20 recommended), otherwise 0
-N_angstrom_masked = 0
-# set emission lines to be masked, comment-out lines that should not be masked
-emlines = [
-    "He-II",  # 'He-II:  3202.15A, 4685.74'
-    "Ne-V",  #  'Ne-V:   3345.81, 3425.81'
-    "O-II",  #  'O-II:   3726.03, 3728.73'
-    "Ne-III",  # 'Ne-III: 3868.69, 3967.40'
-    "H-ζ",  #   'H-ζ:     3889.05'
-    "H-ε",  #  'H-ε:     3970.07'
-    "H-δ",  #   'H-δ:     4101.73'
-    "H-γ",  #   'H-γ:     4340.46'
-    "O-III",  # 'O-III:  4363.15, 4958.83, 5006.77'
-    "Ar-IV",  # 'Ar-IV:  4711.30, 4740.10'
-    "H-β",  #   'H-β:     4861.32'
-    "N-I",  #   'H-I:    5197.90, 5200.39'
-    "He-I",  #  'He-I:   5875.60'
-    "O-I",  #   'O-I:    6300.20, 6363.67'
-    "N-II",  #  'N-II:   6547.96, 6583.34'
-    "H-α",  #   'H-α:     6562.80'
-    "S-II",  #  'S-II:   6716.31, 6730.68'
-    "Ar-III",  #'Ar-III: 7135.67'
-]
-
-# choose model: 'm11','m11-sg','MaStar')
-model_key = "MaStar"
-
-# model flavour
-# m11: 'MILES', 'STELIB', 'ELODIE', 'MARCS'
-# MaStar: 'gold'
-model_lib = ["gold"]
-
-# choose IMF: 'kr' (Kroupa), 'ss' (Salpeter)
-imfs = ["kr"]
-
-# minimum age and metallicity of models to be used
-# choose age in Gyr or 'AoU' for the age of the Universe
-age_limits = [0, "AoU"]
-Z_limits = [-3.0, 3.0]
-
-# specify data medium: 'air', 'vaccum'
-data_wave_medium = "vacuum"
-# Firefly assumes flux units of erg/s/A/cm^2.
-# Choose factor in case flux is scaled
-# (e.g. flux_units=10**(-17) for MaNGA)
-flux_units = 10 ** (-17)
-
-# set whether to correct for Milky Way reddening
-milky_way_reddening = True
-# set parameters for dust determination: 'on', 'hpf_only' (i.e. E(B-V)=0)
-hpf_mode = "on"
-# 'calzetti', 'allen', 'prevot'
-dust_law = "calzetti"
-
-# Only change the following parameters, if you know what you are doing.
-max_ebv = 1.5
-num_dust_vals = 200
-dust_smoothing_length = 200
-max_iterations = 10
-pdf_sampling = 300
-
-# END Configuration
-# ------------------------------
-
 
 def f(i):
     galaxy_bin_number = i
-    print("Fitting bin number {}".format(i))
-    output_file = direc + "/spFly-" + str(plate) + "-" + str(ifu) + "-bin" + str(i)
-    spec = fs.Setup(
+    print(f"Fitting bin number {i}")
+    output_file = f"{direc}/spFly-{plate}-{ifu}-bin{i}"
+    spec = Setup(
         maps,
-        milky_way_reddening=milky_way_reddening,
-        N_angstrom_masked=N_angstrom_masked,
-        hpf_mode=hpf_mode,
+        config.milky_way_reddening,
+        config.hpf_mode,
+        config.n_angstrom_masked,
     )
     spec.openMANGASpectrum(
-        logcube, dap_file, galaxy_bin_number, plate, ifu, emlines, mpl=mpl
+        logcube, 
+        dap_file, 
+        galaxy_bin_number, 
+        plate, 
+        ifu, 
+        config.emlines, 
+        mpl
     )
 
-    age_min = age_limits[0]
-    if type(age_limits[1]) == str:
-        if age_limits[1] == "AoU":
-            age_max = cosmo.age(spec.redshift).value
-        elif age_limits[1] != "AoU":
-            print("Unrecognised maximum age limit. Try again.")
-            sys.exit()
-    else:
-        age_max = age_limits[1]
-
     # prepare model templates
-    model = fm.StellarPopulationModel(
+    model = StellarPopulationModel(
         spec,
         output_file,
-        cosmo,
-        models=model_key,
-        model_libs=model_lib,
-        imfs=imfs,
-        age_limits=[age_min, age_max],
+        config.cosmo,
+        models=config.model_key,
+        model_libs=config.model_lib,
+        imfs=config.imfs,
+        age_limits= config.age_limits,
         downgrade_models=True,
-        data_wave_medium=data_wave_medium,
-        Z_limits=Z_limits,
-        suffix=suffix,
+        data_wave_medium=config.data_wave_medium,
+        Z_limits=config.z_limits,
+        suffix=config.suffix,
         use_downgraded_models=False,
-        dust_law=dust_law,
-        max_ebv=max_ebv,
-        num_dust_vals=num_dust_vals,
-        dust_smoothing_length=dust_smoothing_length,
-        max_iterations=max_iterations,
-        pdf_sampling=pdf_sampling,
-        flux_units=flux_units,
+        dust_law=config.dust_law,
+        max_ebv=config.max_ebv,
+        num_dust_vals=config.num_dust_vals,
+        dust_smoothing_length=config.dust_smoothing_length,
+        max_iterations=config.max_iterations,
+        pdf_sampling=config.pdf_sampling,
+        flux_units=config.flux_units,
     )
     # initiate fit
     model.fit_models_to_data()
-
 
 def f_mp(unique_bin_number):  # multiprocessing function
     if __name__ == "__main__":
@@ -175,13 +104,11 @@ def f_mp(unique_bin_number):  # multiprocessing function
         pool.close()
         pool.join()
 
-
 # ------------------------------
 # START Running firefly
 
-print("")
-print("Starting firefly ...")
-print("Plate = {}, IFU = {}".format(plate, ifu))
+print("\nStarting firefly ...")
+print(f"Plate = {plate}, IFU = {ifu}")
 
 # Set MAPS and LOGCUBE paths.
 # For DR17 use defaul, for DR15 use '[...]VOR10-GAU-MILESHC.fits.gz'
@@ -189,13 +116,13 @@ logcube = os.path.join(
     logcube_dir,
     str(plate),
     str(ifu),
-    "manga-" + str(plate) + "-" + str(ifu) + "-LOGCUBE-VOR10-MILESHC-MASTARSSP.fits.gz",
+    f"manga-{plate}-{ifu}-LOGCUBE-VOR10-MILESHC-MASTARSSP.fits.gz",
 )
 maps = os.path.join(
     maps_dir,
     str(plate),
     str(ifu),
-    "manga-" + str(plate) + "-" + str(ifu) + "-MAPS-VOR10-MILESHC-MASTARSSP.fits.gz",
+    f"manga-{plate}-{ifu}-MAPS-VOR10-MILESHC-MASTARSSP.fits.gz",
 )
 
 # Create output path if it doesn't exist.
@@ -206,7 +133,7 @@ if not os.path.exists(direc):
 # Read in MAPS file as this contains part of the information.
 maps_header = fits.open(maps)
 unique_bin_number = list(np.unique(maps_header["BINID"].data)[1:])
-print("Number of bins = {}".format(len(unique_bin_number)))
+print(f"Number of bins = {len(unique_bin_number)}")
 
 if bin_number == "all":
     N = f_mp(unique_bin_number)
