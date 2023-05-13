@@ -3,10 +3,12 @@ import os
 import time
 import traceback
 import numpy as np
-from astropy.io.fits import Header, PrimaryHDU, HDUList
+from astropy.io import fits
 from src.setup import Setup
 from src.models import StellarPopulationModel
 from src.config import Config
+
+params = sys.argv[1:]
 
 # sys.path.append(os.path.join(os.getcwd(), "python"))
 os.environ["FF_DIR"] = os.getcwd()
@@ -16,18 +18,36 @@ os.environ["STELLARPOPMODELS_DIR"] = os.path.join(
 
 t0 = time.time()
 
-config = Config().create("config/default.yaml").verify()
+config = Config()
 
-data = np.loadtxt(config.file, unpack=True)
-wavelength = data[0, :]
-flux = data[1, :]
-error = data[2, :]
+if len(params) == 0:
+    config.create("config/default.yaml")
+    data = np.loadtxt(config.file, unpack=True)
+    wavelength = data[0, :]
+    flux = data[1, :]
+    error = data[2, :]
+elif params[1] == "sdss":
+    config.create("config/sdss.yaml")
+    hdul = fits.open(config.file)
+    # update config
+    config.redshift = hdul[2].data["Z"][0]
+    config.ra = hdul[0].header["RA"]
+    config.dec = hdul[0].header["DEC"]
+    config.vdisp = hdul[2].data["VDISP"][0]
+    
+    wavelength = 10 ** hdul[1].data["loglam"]
+    flux = hdul[1].data["flux"]
+    error = hdul[1].data["ivar"] ** (-0.5)
+else: 
+    raise Exception("Unknown Config")
+
 restframe_wavelength = wavelength / (1 + config.redshift)
 # instrumental resolution
 r_instrument = np.zeros(len(wavelength))
 for wi, w in enumerate(wavelength):
-    r_instrument[wi] = 2000
-    
+    r_instrument[wi] = 2000    
+
+config.verify()
 
 print("\nStarting firefly ...")
 
@@ -54,7 +74,7 @@ if os.path.isdir(outputFolder) is False:
 
 print(f"\nOutput file: {output_file}\n")
 
-prihdr = Header()
+prihdr = fits.Header()
 prihdr["FILE"] = os.path.basename(output_file)
 prihdr["MODELS"] = config.model_key
 prihdr["FITTER"] = "FIREFLY"
@@ -64,12 +84,15 @@ prihdr["ZMIN"] = str(Z_min)
 prihdr["ZMAX"] = str(Z_max)
 prihdr["redshift"] = config.redshift
 prihdr["HIERARCH age_universe"] = np.round(config.age_of_universe(), 3)
-prihdu = PrimaryHDU(header=prihdr)
+prihdu = fits.PrimaryHDU(header=prihdr)
 tables = [prihdu]
 
 # define input object to pass data on to firefly modules and initiate run
 spec = Setup(
-    config.file, config.milky_way_reddening, config.hpf_mode, config.n_angstrom_masked
+    config.file, 
+    config.milky_way_reddening, 
+    config.hpf_mode, 
+    config.n_angstrom_masked
 )
 
 spec.openSingleSpectrum(
@@ -85,7 +108,6 @@ spec.openSingleSpectrum(
 )
 
 did_not_converge = 0.0
-
 try:
     # prepare model templates
     model = StellarPopulationModel(
@@ -105,7 +127,7 @@ try:
         max_ebv=config.max_ebv,
         num_dust_vals=config.num_dust_vals,
         dust_smoothing_length=config.dust_smoothing_length,
-        max_iterations=config.max_itterations,
+        max_iterations=config.max_iterations,
         pdf_sampling=config.pdf_sampling,
         flux_units=config.flux_units,
     )
@@ -121,7 +143,7 @@ except Exception:
     traceback.print_exc()
 finally:
     if did_not_converge < 1:
-        complete_hdus = HDUList(tables)
+        complete_hdus = fits.HDUList(tables)
         if os.path.isfile(output_file):
             os.remove(output_file)
         complete_hdus.writeto(output_file)
