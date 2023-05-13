@@ -36,15 +36,11 @@ import pandas as pd
 import os,sys
 from os.path import join
 import copy
-from scipy.interpolate import interp1d
-#from scipy.stats import sigmaclip
-from firefly_estimations_3d import estimation
-#from firefly_dust import *
-#import firefly_dust as f_dust
-from firefly_dust import hpf, unred, determine_attenuation, dust_calzetti_py
-from firefly_instrument import downgrade
-from firefly_fitter import fitter
-from firefly_library import airtovac, convert_chis_to_probs, light_weights_to_mass, calculate_averages_pdf, normalise_spec, match_data_models
+from .firefly_estimations_3d import estimation
+from .firefly_dust import hpf, unred, determine_attenuation, dust_calzetti_py
+from .firefly_instrument import downgrade
+from .firefly_fitter import fitter
+from .firefly_library import airtovac, convert_chis_to_probs, light_weights_to_mass, calculate_averages_pdf, normalise_spec, match_data_models
 import matplotlib.pyplot as plt
 
 default_value = -9999

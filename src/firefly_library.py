@@ -7,7 +7,6 @@ if sys.version > '3':
     long = int
 
 import numpy as np
-import copy
 import pickle as cPickle
 from scipy.stats import chi2 
 

@@ -22,27 +22,24 @@
 '''
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 class estimation():
-        def __init__(self,datax,datay,dataz):
-            self.x = datax
-            self.y = datay
-            self.v = dataz
+    def __init__(self,datax,datay,dataz):
+        self.x = datax
+        self.y = datay
+        self.v = dataz
 
-        def estimate(self,x,y,using='ISD'):
-            """
-            Estimate point at coordinate x,y based on the input data for this
-            class.
-            """
-            if using == 'ISD':
-                return self._isd(x,y)
+    def estimate(self,x,y,using='ISD'):
+        """
+        Estimate point at coordinate x,y based on the input data for this
+        class.
+        """
+        if using == 'ISD':
+            return self._isd(x,y)
 
-        def _isd(self,x,y):
-            d = np.sqrt((x-self.x)**2+(y-self.y)**2)
-            if d.min() > 0:
-                v = np.sum(self.v*(1/d**2)/np.sum(1/d**2))
-                return v
-            else:
-                return self.v[d.argmin()]
-
+    def _isd(self,x,y):
+        d = np.sqrt((x-self.x)**2+(y-self.y)**2)
+        if d.min() > 0:
+            v = np.sum(self.v*(1/d**2)/np.sum(1/d**2))
+            return v
+        return self.v[d.argmin()]

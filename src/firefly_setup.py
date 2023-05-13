@@ -8,7 +8,6 @@ The class firefly_setup is dedicated to handling spectra to be fed to FIREFLY fo
 *Imports*::
 	import numpy as np
 	import astropy.io.fits as pyfits
-	import os
 	from firefly_dust import get_dust_radec	
 	import astropy.cosmology as cc
 	import astropy.units as uu
@@ -17,8 +16,9 @@ The class firefly_setup is dedicated to handling spectra to be fed to FIREFLY fo
 
 import numpy as np
 import astropy.io.fits as pyfits
-import os
-from firefly_dust import get_dust_radec
+
+from src.config import Config
+from .firefly_dust import get_dust_radec
 
 import astropy.cosmology as cc
 cosmo = cc.Planck15
@@ -55,6 +55,12 @@ class firefly_setup:
 		self.milky_way_reddening = milky_way_reddening
 		self.hpf_mode = hpf_mode
 		self.N_angstrom_masked = N_angstrom_masked
+  
+	# def __init__(self, config : Config):
+	# 	self.path_to_spectrum = config.file
+	# 	self.milky_way_reddening = config.milky_way_reddening
+	# 	self.hpf_mode = config.hpf_mode
+	# 	self.N_angstrom_masked = config.n_angstrom_masked
 
 	def mask_emissionlines(self, element_emission_lines):
 

@@ -6,8 +6,8 @@ import scipy.interpolate as interpolate
 from astropy.io import fits
 import time
 
-from firefly_fitter import fitter, sigmaclip
-from firefly_library import normalise_spec 
+from .firefly_fitter import fitter, sigmaclip
+from .firefly_library import normalise_spec 
 #from firefly_instrument import *
 
 # Calzetti curves, and other general attenuation curves are computed
