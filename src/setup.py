@@ -51,15 +51,70 @@ class Setup:
         
     """
     def __init__(self, config : Config):
-        self.path_to_spectrum = config.file
-        self.milky_way_reddening = config.milky_way_reddening
-        self.hpf_mode = config.hpf_mode
-        self.N_angstrom_masked = config.n_angstrom_masked
-        self.redshift=config.redshift
-        self.ra=config.ra
-        self.dec=config.dec
-        self.vdisp=config.vdisp
-        self.emlines = config.emlines
+        self.config = config
+        
+    @property
+    def path_to_spectrum(self):
+        return self.config.file
+    @path_to_spectrum.setter
+    def path_to_spectrum(self, path_to_spectrum):
+        self.config.file = path_to_spectrum
+    
+    @property
+    def milky_way_reddening(self):
+        return self.config.milky_way_reddening
+    @milky_way_reddening.setter
+    def milky_way_reddening(self, milky_way_reddening):
+        self.config.milky_way_reddening = milky_way_reddening
+    
+    @property
+    def hpf_mode(self):
+        return self.config.hpf_mode
+    @hpf_mode.setter
+    def hpf_mode(self, hpf_mode):
+        self.config.hpf_mode = hpf_mode
+    
+    @property
+    def n_angstrom_masked(self):
+        return self.config.n_angstrom_masked
+    @n_angstrom_masked.setter
+    def n_angstrom_masked(self, n_angstrom_masked):
+        self.config.n_angstrom_masked = n_angstrom_masked
+    
+    @property
+    def redshift(self):
+        return self.config.redshift
+    @redshift.setter
+    def redshift(self, redshift):
+        self.config.redshift = redshift
+    
+    @property
+    def ra(self):
+        return self.config.ra
+    @ra.setter  
+    def ra(self, ra):
+        self.config.ra = ra
+    
+    @property
+    def dec(self):
+        return self.config.dec
+    @dec.setter
+    def dec(self, dec):
+        self.config.dec = dec
+    
+    @property
+    def vdisp(self):
+        return self.config.vdisp
+    @vdisp.setter
+    def vdisp(self, vdisp):
+        self.config.vdisp = vdisp
+        
+    @property
+    def emlines(self):
+        return self.config.emlines
+    @emlines.setter
+    def emlines(self, emlines):
+        self.config.emlines = emlines
 
     def mask_emissionlines(self, element_emission_lines):
 
@@ -110,12 +165,12 @@ class Setup:
                         n_line = line[n]
 
                         #Creates the boolean array
-                        temp_lines_mask = ((self.restframe_wavelength > n_line - self.N_angstrom_masked) & (self.restframe_wavelength < n_line + self.N_angstrom_masked))
+                        temp_lines_mask = ((self.restframe_wavelength > n_line - self.n_angstrom_masked) & (self.restframe_wavelength < n_line + self.n_angstrom_masked))
                         #Adds the boolean array to the exisiting one to save it
                         self.lines_mask = (temp_lines_mask | self.lines_mask)
                         
                 else:
-                    temp_lines_mask = ((self.restframe_wavelength > line - self.N_angstrom_masked) & (self.restframe_wavelength < line + self.N_angstrom_masked))
+                    temp_lines_mask = ((self.restframe_wavelength > line - self.n_angstrom_masked) & (self.restframe_wavelength < line + self.n_angstrom_masked))
                     self.lines_mask = (temp_lines_mask | self.lines_mask)
 
             else:
