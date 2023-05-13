@@ -7,12 +7,12 @@ from astropy.io import fits
 from src.setup import Setup
 from src.models import StellarPopulationModel
 from src.config import Config
+from src.io import IO
 
 params = sys.argv[1:]
 
-os.environ["FF_DIR"] = os.getcwd()
 os.environ["STELLARPOPMODELS_DIR"] = os.path.join(
-    os.environ["FF_DIR"], "stellar_population_models"
+    os.getcwd(), "stellar_population_models"
 )
 
 t0 = time.time()
@@ -50,41 +50,18 @@ config.verify()
 
 print("\nStarting firefly ...")
 
-Z_min = config.z_limits[0]
-Z_max = config.z_limits[1]
-
 # set output folder and output filename in firefly directory
 # and write output file
-outputFolder = os.path.join(os.environ["FF_DIR"], "output")
+outputFolder = os.path.join(os.getcwd(), "output")
 output_file_name, _ = os.path.splitext(os.path.basename(config.file))
 output_file = os.path.join(outputFolder, f"spFly-{output_file_name}.fits")
 
-
-if os.path.isfile(output_file):
-    print(
-        "\nWarning: This object has already been processed, the file will be over-witten."
-    )
-    answer = input("** Do you want to continue? (Y/N)")
-    if answer.upper() == "N":
-        sys.exit()
-    os.remove(output_file)
-if os.path.isdir(outputFolder) is False:
-    os.mkdir(outputFolder)
+IO.warn_overwrite(output_file)
+IO.ensure_dir(outputFolder)
 
 print(f"\nOutput file: {output_file}\n")
 
-prihdr = fits.Header()
-prihdr["FILE"] = os.path.basename(output_file)
-prihdr["MODELS"] = config.model_key
-prihdr["FITTER"] = "FIREFLY"
-prihdr["AGEMIN"] = str(config.age_limits[0])
-prihdr["AGEMAX"] = str(config.age_limits[1])
-prihdr["ZMIN"] = str(Z_min)
-prihdr["ZMAX"] = str(Z_max)
-prihdr["redshift"] = config.redshift
-prihdr["HIERARCH age_universe"] = np.round(config.age_of_universe(), 3)
-prihdu = fits.PrimaryHDU(header=prihdr)
-tables = [prihdu]
+tables = IO.create_fits_tables(output_file, config)
 
 did_not_converge = 0.0
 try:
