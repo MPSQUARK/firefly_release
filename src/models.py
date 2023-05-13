@@ -42,6 +42,7 @@ from .instrument import downgrade
 from .fitter import Fitter
 from .library import airtovac, convert_chis_to_probs, light_weights_to_mass, calculate_averages_pdf, normalise_spec, match_data_models
 import matplotlib.pyplot as plt
+from src.config import Config
 
 default_value = -9999
 EPS = 10.E-10
@@ -96,20 +97,20 @@ class StellarPopulationModel:
 		 #. Finally, it writes the output files
 
 	"""
-	def __init__(self, specObs, outputFile, cosmo, models = 'MaStar', model_libs = ['gold'], imfs = ['kr'], hpf_mode = 'on', age_limits = [0,15], downgrade_models = True, dust_law = 'calzetti', max_ebv = 1.5, num_dust_vals = 200, dust_smoothing_length = 200, max_iterations = 10, fit_per_iteration_cap = 1000, pdf_sampling = 300, data_wave_medium = 'vacuum', Z_limits = [-3,3], wave_limits = [0,99999990], suffix = "",use_downgraded_models = False, write_results=True, flux_units=10**-17):
-		self.cosmo = cosmo
+	def __init__(self, specObs, outputFile, config: Config, downgrade_models = True, fit_per_iteration_cap = 1000, wave_limits = [0,99999990],use_downgraded_models = False):
+		self.cosmo = config.cosmo
 		self.specObs = specObs
 		self.outputFile = outputFile
 		#################### STARTS HERE ####################
 		# sets the models
-		self.models = models # m11/MaStar
-		self.model_libs = model_libs
-		self.suffix = suffix
+		self.models = config.model_key
+		self.model_libs = config.model_lib
+		self.suffix = config.suffix
 		self.deltal_libs = []
 		self.vdisp_round = int(round(self.specObs.vdisp/5.0)*5.0) # rounding vDisp for the models
 		self.use_downgraded_models = use_downgraded_models
-		self.write_results = write_results
-		self.flux_units = flux_units
+		self.write_results = config.write_results
+		self.flux_units = config.flux_units
 		if (self.models == 'm11') or (self.models == 'm11-sg'):
 			for m in self.model_libs:
 				if m == 'MILES':
@@ -130,23 +131,23 @@ class StellarPopulationModel:
 			self.deltal_libs.append(r_model)
 			
 		# sets the Initial mass function
-		self.imfs = imfs
-		self.hpf_mode = hpf_mode
-		self.age_limits = age_limits
+		self.imfs = config.imfs
+		self.hpf_mode = config.hpf_mode
+		self.age_limits = config.age_limits
 
 		self.downgrade_models = downgrade_models
-		self.dust_law = dust_law
-		self.max_ebv = max_ebv
-		self.num_dust_vals = num_dust_vals
-		self.dust_smoothing_length = dust_smoothing_length
+		self.dust_law = config.dust_law
+		self.max_ebv = config.max_ebv
+		self.num_dust_vals = config.num_dust_vals
+		self.dust_smoothing_length = config.dust_smoothing_length
 		# Specific fitting options
-		self.max_iterations = max_iterations
+		self.max_iterations = config.max_iterations
 		self.fit_per_iteration_cap = fit_per_iteration_cap
 		# Sampling size when calculating the maximum pdf (100=recommended)
-		self.pdf_sampling = pdf_sampling
+		self.pdf_sampling = config.pdf_sampling
 		# Default is air, unless manga is used
-		self.data_wave_medium = data_wave_medium
-		self.Z_limits = Z_limits
+		self.data_wave_medium = config.data_wave_medium
+		self.Z_limits = config.z_limits
 		self.wave_limits = wave_limits
 
 	def get_model(self, model_used, imf_used, deltal, vdisp, wave_instrument, r_instrument, ebv_mw):

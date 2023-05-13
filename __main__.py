@@ -10,7 +10,6 @@ from src.config import Config
 
 params = sys.argv[1:]
 
-# sys.path.append(os.path.join(os.getcwd(), "python"))
 os.environ["FF_DIR"] = os.getcwd()
 os.environ["STELLARPOPMODELS_DIR"] = os.path.join(
     os.environ["FF_DIR"], "stellar_population_models"
@@ -88,53 +87,23 @@ prihdu = fits.PrimaryHDU(header=prihdr)
 tables = [prihdu]
 
 # define input object to pass data on to firefly modules and initiate run
-spec = Setup(
-    config.file, 
-    config.milky_way_reddening, 
-    config.hpf_mode, 
-    config.n_angstrom_masked
-)
-
-spec.openSingleSpectrum(
-    wavelength,
-    flux,
-    error,
-    config.redshift,
-    config.ra,
-    config.dec,
-    config.vdisp,
-    config.emlines,
-    r_instrument,
-)
+spec = Setup(config).openSingleSpectrum(
+        wavelength,
+        flux,
+        error,
+        config,
+        r_instrument,
+    )
 
 did_not_converge = 0.0
 try:
     # prepare model templates
-    model = StellarPopulationModel(
-        spec,
-        output_file,
-        config.cosmo,
-        models=config.model_key,
-        model_libs=config.model_lib,
-        imfs=config.imfs,
-        age_limits=config.age_limits,
-        downgrade_models=True,
-        data_wave_medium=config.data_wave_medium,
-        Z_limits=config.z_limits,
-        suffix=config.suffix,
-        use_downgraded_models=False,
-        dust_law=config.dust_law,
-        max_ebv=config.max_ebv,
-        num_dust_vals=config.num_dust_vals,
-        dust_smoothing_length=config.dust_smoothing_length,
-        max_iterations=config.max_iterations,
-        pdf_sampling=config.pdf_sampling,
-        flux_units=config.flux_units,
-    )
+    model = StellarPopulationModel(spec,output_file,config)
 
     # initiate fit
     model.fit_models_to_data()
     tables.append(model.tbhdu)
+    
 except ValueError:
     tables.append(model.create_dummy_hdu())
     did_not_converge += 1
