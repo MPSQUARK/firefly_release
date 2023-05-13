@@ -31,7 +31,7 @@ class Config():
     _max_ebv : float
     _num_dust_vals : int
     _dust_smoothing_length : int
-    _max_itterations : int
+    _max_iterations : int
     _pdf_sampling : int
 
     @property
@@ -219,12 +219,12 @@ class Config():
         self._dust_smoothing_length = value
 
     @property
-    def max_itterations(self) -> int:
+    def max_iterations(self) -> int:
         '''Maximum number of itterations to use'''
-        return self._max_itterations
-    @max_itterations.setter
-    def max_itterations(self, value: int) -> None:
-        self._max_itterations = value
+        return self._max_iterations
+    @max_iterations.setter
+    def max_iterations(self, value: int) -> None:
+        self._max_iterations = value
 
     @property
     def pdf_sampling(self) -> int:
@@ -296,7 +296,7 @@ class Config():
         self.max_ebv = config.get('Max_EBV')
         self.num_dust_vals = config.get('Num_Dust_Vals')
         self.dust_smoothing_length = config.get('Dust_Smoothing_Length')
-        self.max_itterations = config.get('Max_Itterations')
+        self.max_iterations = config.get('Max_Itterations')
         self.pdf_sampling = config.get('PDF_Sampling')
         self.emlines = config.get('Emission_Lines')
         
@@ -326,7 +326,7 @@ class Config():
         assert self.max_ebv is not None, 'Max E(B-V) not set'
         assert self.num_dust_vals is not None, 'Num Dust Vals not set'
         assert self.dust_smoothing_length is not None, 'Dust Smoothing Length not set'
-        assert self.max_itterations is not None, 'Max Itterations not set'
+        assert self.max_iterations is not None, 'Max Itterations not set'
         assert self.pdf_sampling is not None, 'PDF Sampling not set'
         assert self.emlines is not None, 'Emission Lines not set'
         
