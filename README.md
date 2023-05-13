@@ -50,11 +50,11 @@ setenv STELLARPOPMODELS_DIR '[your path to Firefly]/stellar_population_models'
 ### How to run the code
 Use the following command in the directorty where you installed Firefly:
 ```
-python run/firefly.py
+python run/__main__.py
 ```
 or
 ```
-python run/firefly_sdss.py
+python run/__main__.py sdss
 ```
 or
 ```
