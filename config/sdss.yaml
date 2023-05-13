@@ -1,0 +1,66 @@
+# input file with path to read in wavelength, flux and flux error arrays
+# the example is for an ascii file with extension 'ascii'
+File: example_data/spec-0266-51602-0001.fits
+Cosmo: Planck15
+Suffix: ""
+Redshift: Null # Defined in the fits file
+Right_Ascension: Null # Defined in the fits file
+Declination: Null # Defined in the fits file
+# Velocity Dispersion in km/s
+Velocity_Dispersion: Null # Defined in the fits file
+# masking emission lines
+# defines size in \AA of mask in pixels
+# set to value>0 for masking (20 recommended), otherwise 0
+N_Angstrom_masked: 0
+# choose model: 'm11', 'MaStar'
+Model_Key: "MaStar"
+#model flavour
+# m11: 'MILES', 'STELIB', 'ELODIE', 'MARCS'-(kr IMF only)
+# MaStar: 'gold'
+Model_Library: 
+  - "gold"
+# Options: 'kr' (Kroupa) 'ss' (Salpeter)
+IMFs: 
+  - kr
+# In Gyr or AoU for the age of the universe
+Age_Min: 0
+Age_Max: AoU
+# Metallicity
+Z_Min: -3
+Z_Max: 3
+# Options: 'vacuum', 'air'
+Wave_Medium: "vacuum"
+# 10**-17 for SDSS
+# Note: Remember '.' else else it will be interpreted as a string
+Flux_Units: 1.0e-17 # erg/s/cm^2/Ang 
+Write_Results: Yes
+Milkyway_Reddening: On
+# Options: 'on', 'hpf_only'
+HPF_Mode: 'on'
+# Options: 'calzetti', 'allen', 'prevot'
+Dust_Law: 'calzetti'
+Max_EBV: 1.5
+Num_Dust_Vals: 200
+Dust_Smoothing_Length: 200
+Max_Itterations: 10
+PDF_Sampling: 300
+# set emission lines to be masked, comment-out lines that should not be masked
+Emission_Lines: 
+  - He-II  #  He-II:   3202.15A, 4685.74
+  - Ne-V   #   Ne-V:   3345.81, 3425.81
+  - O-II   #   O-II:   3726.03, 3728.73
+  - Ne-III # Ne-III:   3868.69, 3967.40
+  - H-ζ    #    H-ζ:   3889.05
+  - H-ε    #    H-ε:   3970.07
+  - H-δ    #    H-δ:   4101.73
+  - H-γ    #    H-γ:   4340.46
+  - O-III  #  O-III:   4363.15, 4958.83, 5006.77
+  - Ar-IV  #  Ar-IV:   4711.30, 4740.10
+  - H-β    #    H-β:   4861.32
+  - N-I    #    H-I:   5197.90, 5200.39
+  - He-I   #   He-I:   5875.60
+  - O-I    #    O-I:   6300.20, 6363.67
+  - N-II   #   N-II:   6547.96, 6583.34
+  - H-α    #    H-α:   6562.80
+  - S-II   #   S-II:   6716.31, 6730.68
+  - Ar-III # Ar-III:   7135.67
