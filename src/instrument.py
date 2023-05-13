@@ -44,7 +44,7 @@ import numpy as np
 import astropy
 from astropy.constants import c as speedOfLight
 c = speedOfLight.to('km/s').value
-from .firefly_constants import *
+from .constants import *
 
 def where_not(indx, size):
 	"""
@@ -463,7 +463,7 @@ class spectral_resolution:
         else:
             self.interpolator = InterpolatedUnivariateSpline(wave, sres, k=1, ext = interp_ext)
         self.log10 = log10
-        self.cnst = constants()
+        self.cnst = Constants()
         self.c = astropy.constants.c.to('km/s').value
 
         self.dv = spectrum_velocity_scale(wave) if log10 else None

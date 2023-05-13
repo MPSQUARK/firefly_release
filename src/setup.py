@@ -18,14 +18,14 @@ import numpy as np
 import astropy.io.fits as pyfits
 
 from src.config import Config
-from .firefly_dust import get_dust_radec
+from .dust import get_dust_radec
 
 import astropy.cosmology as cc
 cosmo = cc.Planck15
 import astropy.units as uu
 import astropy.constants as const
 
-class firefly_setup:
+class Setup:
 	"""
 	Loads the environnement to transform observed spectra into the input for FIREFLY. 
 	

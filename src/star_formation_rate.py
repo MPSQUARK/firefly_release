@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from IPython.core.debugger import Tracer
 import warnings
 
-def star_formation_rate(age_in,prob_in):
+def StarFormationRate(age_in,prob_in):
 
 	"""
 	Takes ages and marginalised-in-age likelihoods

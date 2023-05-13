@@ -23,7 +23,7 @@
 
 import numpy as np
 
-class estimation():
+class Estimation():
     def __init__(self,datax,datay,dataz):
         self.x = datax
         self.y = datay

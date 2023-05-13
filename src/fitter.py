@@ -3,7 +3,7 @@ from scipy.stats import sigmaclip
 import copy
 import time
 
-def fitter(wavelength_in,data_in,error_in,models_in,SPM):
+def Fitter(wavelength_in,data_in,error_in,models_in,SPM):
 
 	"""
 	The essential ingredient of FIREFLY!

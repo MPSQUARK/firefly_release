@@ -36,11 +36,11 @@ import pandas as pd
 import os,sys
 from os.path import join
 import copy
-from .firefly_estimations_3d import estimation
-from .firefly_dust import hpf, unred, determine_attenuation, dust_calzetti_py
-from .firefly_instrument import downgrade
-from .firefly_fitter import fitter
-from .firefly_library import airtovac, convert_chis_to_probs, light_weights_to_mass, calculate_averages_pdf, normalise_spec, match_data_models
+from .estimations_3d import Estimation
+from .dust import hpf, unred, determine_attenuation, dust_calzetti_py
+from .instrument import downgrade
+from .fitter import Fitter
+from .library import airtovac, convert_chis_to_probs, light_weights_to_mass, calculate_averages_pdf, normalise_spec, match_data_models
 import matplotlib.pyplot as plt
 
 default_value = -9999
@@ -521,7 +521,7 @@ class StellarPopulationModel:
 				print('dust done, Dt=', time.time()-t_i,'seconds')
 				# 4. Fits the models to the data
 				#self.fit_per_iteration_cap = 1000
-				light_weights, chis, branch = fitter(wave, data_flux, error_flux, model_flux, self)
+				light_weights, chis, branch = Fitter(wave, data_flux, error_flux, model_flux, self)
 				print('fitting done, Dt=', time.time()-t_i,'seconds')
 
 			elif self.hpf_mode == 'hpf_only':
@@ -545,7 +545,7 @@ class StellarPopulationModel:
 				hpf_models,mass_factors = normalise_spec(hpf_data,hpf_models)
 				print('dust done, Dt=', time.time()-t_i,'seconds')
 				# 4. Fits the models to the data
-				light_weights, chis, branch = fitter(wave, hpf_data, hpf_error, hpf_models, self)
+				light_weights, chis, branch = Fitter(wave, hpf_data, hpf_error, hpf_models, self)
 				print('fitting done, Dt=', time.time()-t_i,'seconds')
 
 			print('Gets the best model, Dt=', time.time()-t_i,'seconds')
@@ -618,8 +618,8 @@ class StellarPopulationModel:
 				if dict_imfs[self.imfs[0]] == 'Salpeter':
 					ML_metallicity, ML_age, ML_totM, ML_alive, ML_wd, ML_ns, ML_bh, ML_turnoff = np.loadtxt(join(os.environ['FF_DIR'],'data','massloss_salpeter.txt'), unpack=True, skiprows=2)
 					# First build the grids of the quantities. Make sure they are in linear units.                  
-					estimate_ML_totM, estimate_ML_alive, estimate_ML_wd = estimation(10**ML_metallicity, ML_age, ML_totM), estimation(10**ML_metallicity, ML_age, ML_alive), estimation(10**ML_metallicity, ML_age, ML_wd)
-					estimate_ML_ns, estimate_ML_bh, estimate_ML_turnoff = estimation(10**ML_metallicity, ML_age, ML_ns), estimation(10**ML_metallicity, ML_age, ML_bh), estimation(10**ML_metallicity, ML_age, ML_turnoff)
+					estimate_ML_totM, estimate_ML_alive, estimate_ML_wd = Estimation(10**ML_metallicity, ML_age, ML_totM), Estimation(10**ML_metallicity, ML_age, ML_alive), Estimation(10**ML_metallicity, ML_age, ML_wd)
+					estimate_ML_ns, estimate_ML_bh, estimate_ML_turnoff = Estimation(10**ML_metallicity, ML_age, ML_ns), Estimation(10**ML_metallicity, ML_age, ML_bh), Estimation(10**ML_metallicity, ML_age, ML_turnoff)
 					# Now loop through SSPs to find the nearest values for each.
 					final_ML_totM, final_ML_alive, final_ML_wd, final_ML_ns, final_ML_bh, final_ML_turnoff, final_gas_fraction = [], [], [], [], [], [], []
 					for number in range(len(age_per_ssp)):
@@ -641,8 +641,8 @@ class StellarPopulationModel:
 				if (dict_imfs[self.imfs[0]] == 'Chabrier'):
 					ML_metallicity, ML_age, ML_totM, ML_alive, ML_wd, ML_ns, ML_bh, ML_turnoff = np.loadtxt(join(os.environ['FF_DIR'],'data', 'massloss_chabrier.txt'), unpack=True, skiprows=2)
 					# First build the grids of the quantities. Make sure they are in linear units.			
-					estimate_ML_totM, estimate_ML_alive, estimate_ML_wd = estimation(10**ML_metallicity, ML_age, ML_totM), estimation(10**ML_metallicity, ML_age, ML_alive), estimation(10**ML_metallicity, ML_age, ML_wd)
-					estimate_ML_ns, estimate_ML_bh, estimate_ML_turnoff = estimation(10**ML_metallicity, ML_age, ML_ns), estimation(10**ML_metallicity, ML_age, ML_bh), estimation(10**ML_metallicity, ML_age, ML_turnoff)
+					estimate_ML_totM, estimate_ML_alive, estimate_ML_wd = Estimation(10**ML_metallicity, ML_age, ML_totM), Estimation(10**ML_metallicity, ML_age, ML_alive), Estimation(10**ML_metallicity, ML_age, ML_wd)
+					estimate_ML_ns, estimate_ML_bh, estimate_ML_turnoff = Estimation(10**ML_metallicity, ML_age, ML_ns), Estimation(10**ML_metallicity, ML_age, ML_bh), Estimation(10**ML_metallicity, ML_age, ML_turnoff)
 					# Now loop through SSPs to find the nearest values for each.
 					final_ML_totM, final_ML_alive, final_ML_wd, final_ML_ns, final_ML_bh, final_ML_turnoff, final_gas_fraction = [], [], [], [], [], [], []
 					for number in range(len(age_per_ssp)):
@@ -664,8 +664,8 @@ class StellarPopulationModel:
 				if (dict_imfs[self.imfs[0]] == 'Kroupa'):
 					ML_metallicity, ML_age, ML_totM, ML_alive, ML_wd, ML_ns, ML_bh, ML_turnoff = np.loadtxt(join(os.environ['FF_DIR'],'data','massloss_kroupa.txt'), unpack=True, skiprows=2)
 					# First build the grids of the quantities. Make sure they are in linear units.			
-					estimate_ML_totM, estimate_ML_alive, estimate_ML_wd = estimation(10**ML_metallicity, ML_age, ML_totM), estimation(10**ML_metallicity, ML_age, ML_alive), estimation(10**ML_metallicity, ML_age, ML_wd)
-					estimate_ML_ns, estimate_ML_bh, estimate_ML_turnoff = estimation(10**ML_metallicity, ML_age, ML_ns), estimation(10**ML_metallicity, ML_age, ML_bh), estimation(10**ML_metallicity, ML_age, ML_turnoff)
+					estimate_ML_totM, estimate_ML_alive, estimate_ML_wd = Estimation(10**ML_metallicity, ML_age, ML_totM), Estimation(10**ML_metallicity, ML_age, ML_alive), Estimation(10**ML_metallicity, ML_age, ML_wd)
+					estimate_ML_ns, estimate_ML_bh, estimate_ML_turnoff = Estimation(10**ML_metallicity, ML_age, ML_ns), Estimation(10**ML_metallicity, ML_age, ML_bh), Estimation(10**ML_metallicity, ML_age, ML_turnoff)
 					# Now loop through SSPs to find the nearest values for each.
 					final_ML_totM, final_ML_alive, final_ML_wd, final_ML_ns, final_ML_bh, final_ML_turnoff, final_gas_fraction = [], [], [], [], [], [], []
 					for number in range(len(age_per_ssp)):

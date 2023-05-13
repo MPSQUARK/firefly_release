@@ -5,8 +5,8 @@ import traceback
 import numpy as np
 from astropy.io.fits import Header, PrimaryHDU, HDUList
 import astropy.cosmology as co
-from src.firefly_setup import firefly_setup
-from src.firefly_models import StellarPopulationModel
+from src.setup import Setup
+from src.models import StellarPopulationModel
 from src.config import Config
 
 #sys.path.append(os.path.join(os.getcwd(), "python"))
@@ -66,7 +66,7 @@ prihdu = PrimaryHDU(header=prihdr)
 tables = [prihdu]
 
 #define input object to pass data on to firefly modules and initiate run
-spec= firefly_setup(config.file,config.milky_way_reddening,config.hpf_mode,config.n_angstrom_masked)
+spec= Setup(config.file,config.milky_way_reddening,config.hpf_mode,config.n_angstrom_masked)
 
 spec.openSingleSpectrum(wavelength, flux, error, config.redshift, config.ra, config.dec, config.vdisp, config.emlines, r_instrument)
 

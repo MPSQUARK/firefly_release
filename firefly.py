@@ -19,8 +19,8 @@ os.environ["STELLARPOPMODELS_DIR"] = os.path.join(os.environ["FF_DIR"], "stellar
 import numpy as np
 from astropy.io import fits
 import astropy.cosmology as co
-import src.firefly_setup as fs
-import src.firefly_models as fm
+import src.setup as fs
+import src.models as fm
 import time
 
 t0=time.time()
@@ -167,7 +167,7 @@ prihdu = fm.pyfits.PrimaryHDU(header=prihdr)
 tables = [prihdu]
 
 #define input object to pass data on to firefly modules and initiate run
-spec=fs.firefly_setup(input_file,milky_way_reddening=milky_way_reddening, \
+spec=fs.Setup(input_file,milky_way_reddening=milky_way_reddening, \
                                   N_angstrom_masked=N_angstrom_masked,\
                                   hpf_mode=hpf_mode)
 

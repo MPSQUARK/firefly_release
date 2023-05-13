@@ -6,8 +6,8 @@ import scipy.interpolate as interpolate
 from astropy.io import fits
 import time
 
-from .firefly_fitter import fitter, sigmaclip
-from .firefly_library import normalise_spec 
+from .fitter import Fitter, sigmaclip
+from .library import normalise_spec 
 #from firefly_instrument import *
 
 # Calzetti curves, and other general attenuation curves are computed
@@ -827,7 +827,7 @@ def determine_attenuation(wave,data_flux,error_flux,model_flux,SPM,age,metal):
 	hpf_models,mass_factors = normalise_spec(hpf_data,hpf_models)
 	#print('normalization', time.time()-t_i)
 	# 3. fits the hpf models to data : chi2 maps
-	hpf_weights, hpf_chis, hpf_branch = fitter(wave,hpf_data,hpf_error, hpf_models , SPM )
+	hpf_weights, hpf_chis, hpf_branch = Fitter(wave,hpf_data,hpf_error, hpf_models , SPM )
 	#print('fitting EBV', time.time()-t_i)
 	# 4. use best fit to determine the attenuation curve : fine_attenuation
 	best_fit_index  = [np.argmin(hpf_chis)]

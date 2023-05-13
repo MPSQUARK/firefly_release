@@ -21,8 +21,8 @@ from multiprocessing import Pool
 import numpy as np
 from astropy.io import fits
 import astropy.cosmology as co
-import src.firefly_setup as fs
-import src.firefly_models as fm
+import src.setup as fs
+import src.models as fm
 
 sys.path.append(os.path.join(os.getcwd(), "python"))
 os.environ["FF_DIR"] = os.getcwd()
@@ -118,7 +118,7 @@ def f(i):
     galaxy_bin_number  = i
     print('Fitting bin number {}'.format(i))
     output_file = direc+'/spFly-'+str(plate)+'-'+str(ifu)+'-bin'+str(i)
-    spec = fs.firefly_setup(maps, milky_way_reddening=milky_way_reddening, \
+    spec = fs.Setup(maps, milky_way_reddening=milky_way_reddening, \
                                   N_angstrom_masked=N_angstrom_masked,\
                                   hpf_mode=hpf_mode)
     spec.openMANGASpectrum(logcube, dap_file, galaxy_bin_number, plate, ifu, emlines, mpl=mpl)

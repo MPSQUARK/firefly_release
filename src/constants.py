@@ -47,7 +47,7 @@ import numpy
 
 __author__ = 'Kyle Westfall'
 
-class constants:
+class Constants:
     r"""
     Defines the following set of constants:
 
