@@ -1,2 +1,3 @@
 Original: 110 seconds 12-05-2023
 13-05-2023: 103 seconds
+13-05-2023: 42 seconds - python 3.10.6
