@@ -86,17 +86,11 @@ prihdr["HIERARCH age_universe"] = np.round(config.age_of_universe(), 3)
 prihdu = fits.PrimaryHDU(header=prihdr)
 tables = [prihdu]
 
-# define input object to pass data on to firefly modules and initiate run
-spec = Setup(config).openSingleSpectrum(
-        wavelength,
-        flux,
-        error,
-        config,
-        r_instrument,
-    )
-
 did_not_converge = 0.0
 try:
+    # define input object to pass data on to firefly modules and initiate run
+    spec = Setup(config).openSingleSpectrum(wavelength,flux,error,r_instrument)
+    
     # prepare model templates
     model = StellarPopulationModel(spec,output_file,config)
 
