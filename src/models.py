@@ -101,123 +101,130 @@ class StellarPopulationModel:
     
     @property
     def models(self) -> str:
-        return self.specObs.model_key
+        return self.config.model_key
     @models.setter
     def models(self, value: str):
-        self.specObs.model_key = value
+        self.config.model_key = value
         
     @property
     def model_libs(self) -> str:
-        return self.specObs.model_lib
+        return self.config.model_lib
     @model_libs.setter
     def model_libs(self, value: str):
-        self.specObs.model_lib = value
+        self.config.model_lib = value
         
     @property
     def suffix(self) -> str:
-        return self.specObs.suffix
+        return self.config.suffix
     @suffix.setter
     def suffix(self, value: str):
-        self.specObs.suffix = value
+        self.config.suffix = value
         
     @property
     def write_results(self) -> bool:
-        return self.specObs.write_results
+        return self.config.write_results
     @write_results.setter
     def write_results(self, value: bool):
-        self.specObs.write_results = value
+        self.config.write_results = value
         
     @property
     def flux_units(self) -> str:
-        return self.specObs.flux_units
+        return self.config.flux_units
     @flux_units.setter
     def flux_units(self, value: str):
-        self.specObs.flux_units = value
+        self.config.flux_units = value
         
     @property
     def imfs(self) -> str:
-        return self.specObs.imfs
+        return self.config.imfs
     @imfs.setter
     def imfs(self, value: str):
-        self.specObs.imfs = value
+        self.config.imfs = value
         
     @property
     def hpf_mode(self) -> str:
-        return self.specObs.hpf_mode
+        return self.config.hpf_mode
     @hpf_mode.setter
     def hpf_mode(self, value: str):
-        self.specObs.hpf_mode = value
+        self.config.hpf_mode = value
         
     @property
     def age_limits(self) -> list:
-        return self.specObs.age_limits
+        return self.config.age_limits
     @age_limits.setter
     def age_limits(self, value: list):
-        self.specObs.age_limits = value
+        self.config.age_limits = value
     
     @property
     def dust_law(self) -> str:
-        return self.specObs.dust_law
+        return self.config.dust_law
     @dust_law.setter
     def dust_law(self, value: str):
-        self.specObs.dust_law = value
+        self.config.dust_law = value
         
     @property
     def max_ebv(self) -> float:
-        return self.specObs.max_ebv
+        return self.config.max_ebv
     @max_ebv.setter
     def max_ebv(self, value: float):
-        self.specObs.max_ebv = value
+        self.config.max_ebv = value
         
     @property
     def dust_smoothing_length(self) -> float:
-        return self.specObs.dust_smoothing_length
+        return self.config.dust_smoothing_length
     @dust_smoothing_length.setter
     def dust_smoothing_length(self, value: float):
-        self.specObs.dust_smoothing_length = value
+        self.config.dust_smoothing_length = value
         
     @property
     def max_iterations(self) -> int:
-        return self.specObs.max_iterations
+        return self.config.max_iterations
     @max_iterations.setter
     def max_iterations(self, value: int):
-        self.specObs.max_iterations = value
+        self.config.max_iterations = value
         
     @property
     def pdf_sampling(self) -> int:
-        return self.specObs.pdf_sampling
+        return self.config.pdf_sampling
     @pdf_sampling.setter
     def pdf_sampling(self, value: int):
         '''Sampling size when calculating the maximum pdf (100=recommended)'''
-        self.specObs.pdf_sampling = value
+        self.config.pdf_sampling = value
         
     @property
     def data_wave_medium(self) -> str:
-        return self.specObs.data_wave_medium
+        return self.config.data_wave_medium
     @data_wave_medium.setter
     def data_wave_medium(self, value: str):
-        self.specObs.data_wave_medium = value
+        self.config.data_wave_medium = value
         
     @property
     def z_limits(self) -> list:
-        return self.specObs.z_limits
+        return self.config.z_limits
     @z_limits.setter
     def z_limits(self, value: list):
-        self.specObs.z_limits = value
+        self.config.z_limits = value
         
     @property
     def cosmo(self):
-        return self.specObs.cosmo
+        return self.config.cosmo
     @cosmo.setter
     def cosmo(self, value):
-        self.specObs.cosmo = value
+        self.config.cosmo = value
         
     @property
     def num_dust_vals(self) -> int:
-        return self.specObs.num_dust_vals
+        return self.config.num_dust_vals
     @num_dust_vals.setter
     def num_dust_vals(self, value: int):
-        self.specObs.num_dust_vals = value
+        self.config.num_dust_vals = value
+        
+    @property
+    def config(self) -> Config:
+        return self.specObs.config
+    @config.setter
+    def config(self, value: Config):
+        self.specObs.config = value
  
     def __init__(self, specObs : Setup, output_file, downgrade_models = True, fit_per_iteration_cap = 1000, wave_limits = [0,99999990],use_downgraded_models = False):
         self.specObs = specObs
