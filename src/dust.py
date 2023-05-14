@@ -417,7 +417,7 @@ def get_SFD_dust(long,lat,dustmap='ebv',interpolate=True):
     from numpy import sin,cos,round,isscalar,array,ndarray,ones_like
     #from pyfits import open
     
-    if type(dustmap) is not str:
+    if not isinstance(dustmap, str):
         raise ValueError('dustmap is not a string')
     dml=dustmap.lower()
     if dml == 'ebv' or dml == 'eb-v' or dml == 'e(b-v)' :
@@ -500,7 +500,7 @@ def get_SFD_dust(long,lat,dustmap='ebv',interpolate=True):
         
         if interpolate:
             from scipy.ndimage import map_coordinates
-            if type(interpolate) is int:
+            if isinstance(interpolate, int):
                 retvals.append(map_coordinates(mapd,[x,y],order=interpolate))
             else:
                 retvals.append(map_coordinates(mapd,[x,y]))

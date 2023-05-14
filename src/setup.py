@@ -154,7 +154,7 @@ class Setup:
                 line = emission_dict[ele_line]
 
                 #Check if it contains a tuple (some elements have more then one emission line)
-                if type(line) == tuple:
+                if isinstance(line, tuple):
 
                     #Find the number of emission lines for this value
                     n_lines = len(line)
