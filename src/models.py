@@ -125,7 +125,7 @@ class StellarPopulationModel:
 		elif self.models =='MaStar':
 			model_path = os.environ['STELLARPOPMODELS_DIR']
 			ver='v1.1'
-			hdul=pyfits.open(model_path+'/MaStar_SSP_'+ver+'.fits.gz')
+			hdul=pyfits.open(os.path.join(model_path, f'MaStar_SSP_{ver}.fits.gz'))
 			r_model=hdul[2].data[1,:]
 			# This provides R=lamba/delta_lambda as numpy ndarray. The params deltal_libs and deltal should probably be renamed. 
 			self.deltal_libs.append(r_model)
@@ -193,7 +193,7 @@ class StellarPopulationModel:
 #				if model_used == 'MILES_UVextended' or model_used == 'MILES_revisedIRslope':
 #					model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_MILES', 'ssp_M11_'+model_used+'.'+imf_used)
 #				else:
-			model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_'+model_used+'_SG' ,'ssp_M11_' +model_used +'.' + imf_used)
+			model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],f'SSP_M11_{model_used}_SG' ,f'ssp_M11_{model_used}.{imf_used}')
 
 
 			# Constructs the metallicity array of models :
@@ -306,11 +306,11 @@ class StellarPopulationModel:
 #				if model_used == 'MILES_UVextended' or model_used == 'MILES_revisedIRslope':
 #					model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_MILES', 'ssp_M11_'+model_used+'.'+imf_used)
 #				else:
-			model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],'SSP_M11_'+model_used ,'ssp_M11_' +model_used +'.' + imf_used)
+			model_path 		= join(os.environ['STELLARPOPMODELS_DIR'],f'SSP_M11_{model_used}ssp_M11_{model_used}.{imf_used}')
 
 
 			# Constructs the metallicity array of models :
-			all_metal_files = sorted(glob.glob(model_path+'*'))
+			all_metal_files = sorted(glob.glob(f'{model_path}*'))
 			#print(model_path)
 			#print(all_metal_files)
 			#stop	
@@ -423,7 +423,7 @@ class StellarPopulationModel:
 				
 			#print('IMF slope used: '+str(slope))
 			
-			hdul=pyfits.open(model_path+'/MaStar_SSP_'+ver+'.fits.gz')
+			hdul=pyfits.open(os.path.join(model_path, f'MaStar_SSP_{ver}.fits.gz'))
 
 			t=hdul[1].data[:,0,0,0]
 			Z=hdul[1].data[0,:,0,1]
@@ -761,19 +761,19 @@ class StellarPopulationModel:
 	
 				# quantities per SSP
 				for iii in range(len(order)):
-					tbhdu.header['HIERARCH total_mass_ssp_'+str(iii)] = trylog10(mass_per_ssp[order][iii])
-					tbhdu.header['HIERARCH stellar_mass_ssp_'+str(iii)] = trylog10(final_ML_alive[order][iii]+final_ML_wd[order][iii]+final_ML_ns[order][iii]+final_ML_bh[order][iii])
-					tbhdu.header['HIERARCH living_stars_mass_ssp_'+str(iii)] = trylog10(final_ML_alive[order][iii])	
-					tbhdu.header['HIERARCH remnant_mass_ssp_'+str(iii)] = trylog10(final_ML_wd[order][iii]+final_ML_ns[order][iii]+final_ML_bh[order][iii])
-					tbhdu.header['HIERARCH remnant_mass_in_whitedwarfs_ssp_'+str(iii)] = trylog10(final_ML_wd[order][iii])
-					tbhdu.header['HIERARCH remnant_mass_in_neutronstars_ssp_'+str(iii)] = trylog10(final_ML_ns[order][iii])
-					tbhdu.header['HIERARCH remnant_mass_in_blackholes_ssp_'+str(iii)] = trylog10(final_ML_bh[order][iii])
-					tbhdu.header['HIERARCH mass_of_ejecta_ssp_'+str(iii)] = trylog10(mass_per_ssp[order][iii] - final_ML_totM[order][iii])
-					tbhdu.header['HIERARCH log_age_ssp_'+str(iii)] = trylog10(age_per_ssp[order][iii])
-					tbhdu.header['HIERARCH metal_ssp_'+str(iii)] = trylog10(metal_per_ssp[order][iii])
-					tbhdu.header['HIERARCH SFR_ssp_'+str(iii)] = trylog10(mass_per_ssp[order][iii]/age_per_ssp[order][iii])	
-					tbhdu.header['HIERARCH weightMass_ssp_'+str(iii)] = weight_mass_per_ssp[order][iii]
-					tbhdu.header['HIERARCH weightLight_ssp_'+str(iii)] = weight_light_per_ssp[order][iii]
+					tbhdu.header[f'HIERARCH total_mass_ssp_{iii}'] = trylog10(mass_per_ssp[order][iii])
+					tbhdu.header[f'HIERARCH stellar_mass_ssp_{iii}'] = trylog10(final_ML_alive[order][iii]+final_ML_wd[order][iii]+final_ML_ns[order][iii]+final_ML_bh[order][iii])
+					tbhdu.header[f'HIERARCH living_stars_mass_ssp_{iii}'] = trylog10(final_ML_alive[order][iii])	
+					tbhdu.header[f'HIERARCH remnant_mass_ssp_{iii}'] = trylog10(final_ML_wd[order][iii]+final_ML_ns[order][iii]+final_ML_bh[order][iii])
+					tbhdu.header[f'HIERARCH remnant_mass_in_whitedwarfs_ssp_{iii}'] = trylog10(final_ML_wd[order][iii])
+					tbhdu.header[f'HIERARCH remnant_mass_in_neutronstars_ssp_{iii}'] = trylog10(final_ML_ns[order][iii])
+					tbhdu.header[f'HIERARCH remnant_mass_in_blackholes_ssp_{iii}'] = trylog10(final_ML_bh[order][iii])
+					tbhdu.header[f'HIERARCH mass_of_ejecta_ssp_{iii}'] = trylog10(mass_per_ssp[order][iii] - final_ML_totM[order][iii])
+					tbhdu.header[f'HIERARCH log_age_ssp_{iii}'] = trylog10(age_per_ssp[order][iii])
+					tbhdu.header[f'HIERARCH metal_ssp_{iii}'] = trylog10(metal_per_ssp[order][iii])
+					tbhdu.header[f'HIERARCH SFR_ssp_{iii}'] = trylog10(mass_per_ssp[order][iii]/age_per_ssp[order][iii])	
+					tbhdu.header[f'HIERARCH weightMass_ssp_{iii}'] = weight_mass_per_ssp[order][iii]
+					tbhdu.header[f'HIERARCH weightLight_ssp_{iii}'] = weight_light_per_ssp[order][iii]
 	
 			self.tbhdu = tbhdu
 	

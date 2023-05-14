@@ -16,21 +16,17 @@ csp_Z = np.ndarray(hdul[1].header["ssp_number"])
 csp_light = np.ndarray(hdul[1].header["ssp_number"])
 csp_mass = np.ndarray(hdul[1].header["ssp_number"])
 for i in range(len(csp_age)):
-    csp_age[i] = hdul[1].header["log_age_ssp_" + str(i)]
-    csp_Z[i] = hdul[1].header["metal_ssp_" + str(i)]
-    csp_light[i] = hdul[1].header["weightLight_ssp_" + str(i)]
-    csp_mass[i] = hdul[1].header["weightMass_ssp_" + str(i)]
+    csp_age[i] = hdul[1].header[f"log_age_ssp_{i}"]
+    csp_Z[i] = hdul[1].header[f"metal_ssp_{i}"]
+    csp_light[i] = hdul[1].header[f"weightLight_ssp_{i}"]
+    csp_mass[i] = hdul[1].header[f"weightMass_ssp_{i}"]
 
 print("\n", hdul[0].header)
 print(hdul[1].header, "\n")
-print("age: " + str(np.around(10 ** hdul[1].header["age_lightW"], decimals=2)) + " Gyr")
-print(
-    "[Z/H]: "
-    + str(np.around(hdul[1].header["metallicity_lightW"], decimals=2))
-    + " dex"
-)
-print("log M/Msun: " + str(np.around(hdul[1].header["stellar_mass"], decimals=2)))
-print("E(B-V): " + str(np.around(hdul[1].header["EBV"], decimals=2)) + " mag")
+print(f'age: {np.around(10 ** hdul[1].header["age_lightW"], decimals=2)} Gyr')
+print(f'[Z/H]: {np.around(hdul[1].header["metallicity_lightW"], decimals=2)} dex')
+print(f'log M/Msun: {np.around(hdul[1].header["stellar_mass"], decimals=2)}')
+print(f'E(B-V): {np.around(hdul[1].header["EBV"], decimals=2)} mag')
 
 py.plot(wave, flux)
 py.plot(wave, model)
