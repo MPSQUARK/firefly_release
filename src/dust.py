@@ -2,7 +2,7 @@ import numpy as np
 import warnings
 import math
 import os
-import scipy.interpolate as interpolate
+from scipy.interpolate import interp1d, splrep, splev
 from astropy.io import fits
 import time
 
@@ -84,9 +84,7 @@ def reddening_ccm(wave, ebv=None, a_v=None, r_v=3.1, model='ccm89'):
     [2] Gordon, K. D., Cartledge, S., & Clayton, G. C. 2009, ApJ, 705, 1320
     [3] O'Donnell, J. E. 1994, ApJ, 422, 158O
 
-    """
-
-    from scipy.interpolate import interp1d
+    """    
 
     model = model.lower()
     if model not in ['ccm89','gcc09']:
@@ -217,8 +215,6 @@ def reddening_fm(wave, ebv=None, a_v=None, r_v=3.1, model='f99'):
 
     """
 
-    from scipy.interpolate import interp1d
-
     model = model.lower()
     if model not in ['f99','fm07']:
         raise ValueError('model must be f99 or fm07')
@@ -346,7 +342,7 @@ def dust_calzetti_py(ebv,lam):
 def dust_allen_py(ebv,lam):
 
 	''' Calculates the attenuation for the Milky Way (MW) as found in Allen (1976).'''
-	from scipy.interpolate import interp1d
+	
 	wave = [1000,1110,1250,1430,1670,2000,2220,2500,2860,3330,3650,4000,4400,5000,5530,6700,9000,10000,20000,100000]
 	allen_k = [4.20,3.70,3.30,3.00,2.70,2.80,2.90,2.30,1.97,1.69,1.58,1.45,1.32,1.13,1.00,0.74,0.46,0.38,0.11,0.00]
 	allen_k = np.array(allen_k)*3.1
@@ -364,7 +360,6 @@ def dust_allen_py(ebv,lam):
 def dust_prevot_py(ebv,lam):
 
 	''' Calculates the attenuation for the Small Magellanic Cloud (SMC) as found in Prevot (1984).'''
-	from scipy.interpolate import interp1d
 	wave = [1275,1330,1385,1435,1490,1545,1595,1647,1700,1755,1810,1860,1910,2000,2115,2220,2335,2445,2550,2665,2778,\
 	2890,2995,3105,3704,4255,5291,10000]
 	prevot_k = [13.54,12.52,11.51,10.80,9.84,9.28,9.06,8.49,8.01,7.71,7.17,6.90,6.76,6.38,5.85,5.30,4.53,4.24,3.91,3.49,\
@@ -718,8 +713,8 @@ def unred(wave, ebv, R_V=3.1, LMC2=False, AVGLMC=False):
 	ysplopir = np.concatenate((ysplir,ysplop))
 
 	if (Nopir > 0): 
-	  tck = interpolate.splrep(np.concatenate((xsplopir,xspluv)),np.concatenate((ysplopir,yspluv)),s=0)
-	  curve[iopir] = interpolate.splev(x[iopir], tck)
+		tck = splrep(np.concatenate((xsplopir,xspluv)),np.concatenate((ysplopir,yspluv)),s=0)
+		curve[iopir] = splev(x[iopir], tck)
 
 	#Now apply extinction correction to input flux vector
 	curve *= ebv
