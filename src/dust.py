@@ -3,12 +3,14 @@ import warnings
 import math
 import os
 from scipy.interpolate import interp1d, splrep, splev
+from scipy.ndimage import map_coordinates
 from astropy.io import fits
 import time
 
 from .fitter import Fitter, sigmaclip
 from .library import normalise_spec 
 #from firefly_instrument import *
+#from .coords import equatorial_to_galactic
 
 # Calzetti curves, and other general attenuation curves are computed
 # here, along with (in dust_calzetti) applying to spectra directly.
@@ -97,14 +99,12 @@ def reddening_ccm(wave, ebv=None, a_v=None, r_v=3.1, model='ccm89'):
         ebv = a_v / r_v
 
     if model == 'gcc09':
-        raise ValueError('TEMPORARY: gcc09 currently does 2175A bump '+
-            'incorrectly')
+        raise ValueError('TEMPORARY: gcc09 currently does 2175A bump incorrectly')
 
     x = 1e4 / wave      # inverse microns
 
     if any(x < 0.3) or any(x > 11):
-        raise ValueError('ccm_dered valid only for wavelengths from 910 A to '+
-            '3.3 microns')
+        raise ValueError('ccm_dered valid only for wavelengths from 910 A to 3.3 microns')
     if any(x > 8) and (model == 'ccm89'):
         warnings.warn('CCM89 should not be used below 1250 A.')
 #    if any(x < 3.3) and any(x > 3.3) and (model == 'gcc09'):
@@ -232,8 +232,7 @@ def reddening_fm(wave, ebv=None, a_v=None, r_v=3.1, model='f99'):
     k = np.zeros(x.size)
 
     if any(x < 0.167) or any(x > 11):
-        raise ValueError('fm_dered valid only for wavelengths from 910 A to '+
-            '6 microns')
+        raise ValueError('fm_dered valid only for wavelengths from 910 A to 6 microns')
 
     # UV region
     uvsplit = 10000. / 2700.  # Turn 2700A split into inverse microns.
@@ -409,8 +408,6 @@ def get_SFD_dust(long,lat,dustmap='ebv',interpolate=True):
         tests. Also allow for other bands.
     
     """
-    from numpy import sin,cos,round,isscalar,array,ndarray,ones_like
-    #from pyfits import open
     
     if not isinstance(dustmap, str):
         raise ValueError('dustmap is not a string')
@@ -428,19 +425,17 @@ def get_SFD_dust(long,lat,dustmap='ebv',interpolate=True):
     else:
         dustmapfn=dustmap
     
-    if isscalar(long):
-        l=array([long])*math.pi/180
+    if np.isscalar(long):
+        l=np.array([long])*math.pi/180
     else:
-        l=array(long)*math.pi/180
-    if isscalar(lat):
-        b=array([lat])*math.pi/180
+        l=np.array(long)*math.pi/180
+    if np.isscalar(lat):
+        b=np.array([lat])*math.pi/180
     else:
-        b=array(lat)*math.pi/180
+        b=np.array(lat)*math.pi/180
         
     if not len(l)==len(b):
         raise ValueError('input coordinate arrays are of different length')
-    
-    
     
     if '%s' not in dustmapfn:
         f=fits.open(dustmapfn)
@@ -461,7 +456,7 @@ def get_SFD_dust(long,lat,dustmap='ebv',interpolate=True):
                 b=b
         else:
             raise ValueError("couldn't determine South/North from filename - should have 'sgp' or 'ngp in it somewhere")
-        masks = [ones_like(b).astype(bool)]
+        masks = [np.ones_like(b).astype(bool)]
     else: #need to do things seperately for north and south files
         nmask = b >= 0
         smask = ~nmask
@@ -488,13 +483,12 @@ def get_SFD_dust(long,lat,dustmap='ebv',interpolate=True):
         #project from galactic longitude/latitude to lambert pixels (see SFD98)
         npix=mapd.shape[0]
         
-        x=npix/2*cos(l[m])*(1-n*sin(b[m]))**0.5+npix/2-0.5
-        y=-npix/2*n*sin(l[m])*(1-n*sin(b[m]))**0.5+npix/2-0.5
+        x=npix/2*np.cos(l[m])*(1-n*np.sin(b[m]))**0.5+npix/2-0.5
+        y=-npix/2*n*np.sin(l[m])*(1-n*np.sin(b[m]))**0.5+npix/2-0.5
         #now remap indecies - numpy arrays have y and x convention switched from SFD98 appendix
         x,y=y,x
         
         if interpolate:
-            from scipy.ndimage import map_coordinates
             if isinstance(interpolate, int):
                 retvals.append(map_coordinates(mapd,[x,y],order=interpolate))
             else:
@@ -504,17 +498,14 @@ def get_SFD_dust(long,lat,dustmap='ebv',interpolate=True):
             y=round(y).astype(int)
             retvals.append(mapd[x,y])
             
-            
-    
-        
-    if isscalar(long) or isscalar(lat):
+    if np.isscalar(long) or np.isscalar(lat):
         for r in retvals:
             if len(r)>0:
                 return r[0]
         assert False,'None of the return value arrays were populated - incorrect inputs?'
     else:
         #now recombine the possibly two arrays from above into one that looks like  the original
-        retval=ndarray(l.shape)
+        retval=np.ndarray(l.shape)
         for m,val in zip(masks,retvals):
             retval[m] = val
         return retval
@@ -554,14 +545,12 @@ def eq2gal(ra,dec):
 
 	l = l % (2.0 * math.pi)
 
-
 	return l*180.0/math.pi, b*180.0/math.pi
 
 def get_dust_radec(ra,dec,dustmap,interpolate=True):
 	"""
 	Gets the value of dust from MW at ra and dec.
 	"""
-	#from .coords import equatorial_to_galactic
 	l,b = eq2gal(math.radians(ra),math.radians(dec))
 	return get_SFD_dust(l,b,dustmap,interpolate)
 
@@ -912,4 +901,3 @@ def determine_attenuation(wave,data_flux,error_flux,model_flux,SPM,age,metal):
 	#print('fits attenuation', time.time()-t_i)
 	# #print "Best E(B-V) = "+str(dust_fit)
 	return dust_fit,smooth_attenuation
-
