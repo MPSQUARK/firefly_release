@@ -1,6 +1,7 @@
 import os
 import sys
-from astropy.io.fits import Header, PrimaryHDU
+import numpy as np
+from astropy.io import fits
 from src.config import Config
 
 class IO():
@@ -26,7 +27,7 @@ class IO():
         
     @staticmethod
     def create_fits_tables(output_file, config : Config):
-        prihdr = Header()
+        prihdr = fits.Header()
         prihdr["FILE"] = os.path.basename(output_file)
         prihdr["MODELS"] = config.model_key
         prihdr["FITTER"] = "FIREFLY"
@@ -36,5 +37,51 @@ class IO():
         prihdr["ZMAX"] = str(config.z_limits[1])
         prihdr["redshift"] = config.redshift
         prihdr["HIERARCH age_universe"] = np.round(config.age_of_universe(), 3)
-        prihdu = PrimaryHDU(header=prihdr)
+        prihdu = fits.PrimaryHDU(header=prihdr)
         return [prihdu]
+    
+    @staticmethod
+    def read_config_and_input() -> tuple[Config, dict]:
+        config = Config()
+        data = IO.read_input(config)
+        return (config, data)
+    
+    @staticmethod
+    def read_input(config : Config) -> dict:
+        params = sys.argv[1:]
+        if len(params) == 0:
+            config.create("config/default.yaml")
+            return IO.read_dat_input(config.file)
+        elif params[1] == "sdss":
+            config.create("config/sdss.yaml")
+            return IO.read_sdss_input(config)
+        raise Exception("Unknown Config")
+            
+    @staticmethod
+    def read_dat_input(filepath) -> dict:
+        file_contents = np.loadtxt(filepath, unpack=True)
+        return {
+            "wavelength": file_contents[0, :], 
+            "flux": file_contents[1, :], 
+            "error": file_contents[2, :]
+            }
+        
+    @staticmethod
+    def read_sdss_input(config : Config) -> dict:
+        hdul = fits.open(config.file)
+        
+        # update config
+        config.redshift = hdul[2].data["Z"][0]
+        config.ra = hdul[0].header["RA"]
+        config.dec = hdul[0].header["DEC"]
+        config.vdisp = hdul[2].data["VDISP"][0]
+        
+        # read data
+        data = {
+            "wavelength": 10 ** hdul[1].data["loglam"],
+            "flux": hdul[1].data["flux"],
+            "error": hdul[1].data["ivar"] ** (-0.5)
+            }
+        
+        return data
+        
