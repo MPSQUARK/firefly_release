@@ -1,4 +1,3 @@
-import sys
 import os
 import time
 import traceback
@@ -6,45 +5,21 @@ import numpy as np
 from astropy.io import fits
 from src.setup import Setup
 from src.models import StellarPopulationModel
-from src.config import Config
 from src.io import IO
 
-params = sys.argv[1:]
-
+os.environ["FF_DIR"] = os.getcwd()
 os.environ["STELLARPOPMODELS_DIR"] = os.path.join(
-    os.getcwd(), "stellar_population_models"
+    os.environ["FF_DIR"], "stellar_population_models"
 )
 
-t0 = time.time()
+time_start = time.time()
 
-config = Config()
+config, data = IO.read_config_and_input()
 
-if len(params) == 0:
-    config.create("config/default.yaml")
-    data = np.loadtxt(config.file, unpack=True)
-    wavelength = data[0, :]
-    flux = data[1, :]
-    error = data[2, :]
-elif params[1] == "sdss":
-    config.create("config/sdss.yaml")
-    hdul = fits.open(config.file)
-    # update config
-    config.redshift = hdul[2].data["Z"][0]
-    config.ra = hdul[0].header["RA"]
-    config.dec = hdul[0].header["DEC"]
-    config.vdisp = hdul[2].data["VDISP"][0]
-    
-    wavelength = 10 ** hdul[1].data["loglam"]
-    flux = hdul[1].data["flux"]
-    error = hdul[1].data["ivar"] ** (-0.5)
-else: 
-    raise Exception("Unknown Config")
+restframe_wavelength = data.get('wavelength') / (1 + config.redshift)
 
-restframe_wavelength = wavelength / (1 + config.redshift)
 # instrumental resolution
-r_instrument = np.zeros(len(wavelength))
-for wi, w in enumerate(wavelength):
-    r_instrument[wi] = 2000    
+r_instrument = np.full(len(data.get('wavelength')), 2000)
 
 config.verify()
 
@@ -66,9 +41,7 @@ tables = IO.create_fits_tables(output_file, config)
 did_not_converge = 0.0
 try:
     # define input object to pass data on to firefly modules and initiate run
-    spec = Setup(config).openSingleSpectrum(wavelength,flux,error,r_instrument)
-    
-    # prepare model templates
+    spec = Setup(config).openSingleSpectrum(data.get('wavelength'),data.get('flux'),data.get('error'),r_instrument)
     model = StellarPopulationModel(spec,output_file,config)
 
     # initiate fit
@@ -88,4 +61,4 @@ finally:
             os.remove(output_file)
         complete_hdus.writeto(output_file)
 
-    print("\nDone... total time:", int(time.time() - t0), "seconds.\n")
+    print(f"\nDone... total time: {time.time() - time_start:.2f} seconds.\n")
