@@ -54,11 +54,123 @@ class Setup:
         self.config = config
         
     @property
+    def cosmo(self):
+        return self.config.cosmo
+    @cosmo.setter
+    def cosmo(self, cosmo):
+        self.config.cosmo = cosmo
+        
+    @property
+    def z_limits(self):
+        return self.config.z_limits
+    @z_limits.setter
+    def z_limits(self, z_limits):
+        self.config.z_limits = z_limits
+        
+    @property
+    def data_wave_medium(self):
+        return self.config.data_wave_medium
+    @data_wave_medium.setter
+    def data_wave_medium(self, data_wave_medium):
+        self.config.data_wave_medium = data_wave_medium
+        
+    @property
+    def pdf_sampling(self):
+        return self.config.pdf_sampling
+    @pdf_sampling.setter
+    def pdf_sampling(self, pdf_sampling):
+        self.config.pdf_sampling = pdf_sampling
+    
+    @property
+    def max_iterations(self):
+        return self.config.max_iterations
+    @max_iterations.setter
+    def max_iterations(self, max_iterations):
+        self.config.max_iterations = max_iterations
+        
+    @property
+    def dust_smoothing_length(self):
+        return self.config.dust_smoothing_length
+    @dust_smoothing_length.setter
+    def dust_smoothing_length(self, dust_smoothing_length):
+        self.config.dust_smoothing_length = dust_smoothing_length
+        
+    @property
+    def max_ebv(self):
+        return self.config.max_ebv
+    @max_ebv.setter
+    def max_ebv(self, max_ebv):
+        self.config.max_ebv = max_ebv
+        
+    @property
+    def dust_law(self):
+        return self.config.dust_law
+    @dust_law.setter
+    def dust_law(self, dust_law):
+        self.config.dust_law = dust_law
+        
+    @property
+    def age_limits(self):
+        return self.config.age_limits
+    @age_limits.setter
+    def age_limits(self, age_limits):
+        self.config.age_limits = age_limits
+        
+    @property
+    def imfs(self):
+        return self.config.imfs
+    @imfs.setter
+    def imfs(self, imfs):
+        self.config.imfs = imfs
+        
+    @property
+    def flux_units(self):
+        return self.config.flux_units
+    @flux_units.setter
+    def flux_units(self, flux_units):
+        self.config.flux_units = flux_units
+        
+    @property
+    def write_results(self):
+        return self.config.write_results
+    @write_results.setter
+    def write_results(self, write_results):
+        self.config.write_results = write_results
+        
+    @property
+    def suffix(self):
+        return self.config.suffix
+    @suffix.setter
+    def suffix(self, suffix):
+        self.config.suffix = suffix
+        
+    @property
+    def model_lib(self):
+        return self.config.model_lib
+    @model_lib.setter
+    def model_lib(self, model_lib):
+        self.config.model_lib = model_lib
+        
+    @property
+    def model_key(self):
+        return self.config.model_key
+    @model_key.setter
+    def model_key(self, model_key):
+        self.config.model_key = model_key
+        
+    @property
     def path_to_spectrum(self):
         return self.config.file
     @path_to_spectrum.setter
     def path_to_spectrum(self, path_to_spectrum):
         self.config.file = path_to_spectrum
+        
+    @property
+    def num_dust_vals(self):
+        return self.config.num_dust_vals
+    @num_dust_vals.setter
+    def num_dust_vals(self, num_dust_vals):
+        self.config.num_dust_vals = num_dust_vals
     
     @property
     def milky_way_reddening(self):
