@@ -5,7 +5,7 @@ import numpy as np
 from astropy.io import fits
 from src.setup import Setup
 from src.models import StellarPopulationModel
-from src.io import IO
+from src.ffio import IO
 
 os.environ["FF_DIR"] = os.getcwd()
 os.environ["STELLARPOPMODELS_DIR"] = os.path.join(
@@ -42,7 +42,7 @@ did_not_converge = 0.0
 try:
     # define input object to pass data on to firefly modules and initiate run
     spec = Setup(config).openSingleSpectrum(data.get('wavelength'),data.get('flux'),data.get('error'),r_instrument)
-    model = StellarPopulationModel(spec,output_file,config)
+    model = StellarPopulationModel(spec,output_file)
 
     # initiate fit
     model.fit_models_to_data()
